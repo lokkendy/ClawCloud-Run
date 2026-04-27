@@ -29,7 +29,7 @@
 | `TG_BOT_TOKEN`    | **是**        | 用于发送通知的 Telegram Bot Token。如果你需要接收登录状态或进行两步验证，则必须配置。                                              |
 | `TG_CHAT_ID`      | **是**        | 你的 Telegram User ID 或 Channel ID，用于接收机器人消息。                                                                        |
 | `REPO_TOKEN`      | **是**       | GitHub Personal Access Token。如果希望脚本自动更新 `GH_SESSION`，需要提供此 Token。请授予 `repo` 权限。                            |
-| `DEVICE_VERIFY_WAIT` | 否       | 设备验证的等待时间（秒），默认为 `120`。                                                                                              |
+| `DEVICE_VERIFY_WAIT` | 否       | 设备验证的等待时间（秒），默认为 `180`。                                                                                              |
 | `TWO_FACTOR_WAIT` | 否       | 两步验证的等待时间（秒），默认为 `120`。                                                                                              |
 
 
