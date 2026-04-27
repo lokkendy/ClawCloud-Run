@@ -1,7 +1,7 @@
 """
 ClawCloud 自动登录脚本
 - 自动检测区域跳转（如 ap-southeast-1.console.claw.cloud）
-- 等待设备验证批准（30秒）
+- 等待设备验证批准（默认120秒，可通过 DEVICE_VERIFY_WAIT 调整）
 - 每次登录后自动更新 Cookie
 - Telegram 通知
 """
@@ -17,6 +17,17 @@ from urllib.parse import urlparse
 import requests
 from playwright.sync_api import sync_playwright
 
+
+def get_wait_seconds(name, default):
+    value = os.environ.get(name, "").strip()
+    if not value:
+        return default
+    try:
+        return int(value)
+    except ValueError:
+        return default
+
+
 # ==================== 配置 ====================
 # 代理配置 (留空则不使用)
 # 格式: socks5://user:pass@host:port 或 http://user:pass@host:port
@@ -25,8 +36,8 @@ PROXY_DSN = os.environ.get("PROXY_DSN", "").strip()
 # 固定登录入口，OAuth后会自动跳转到实际区域
 LOGIN_ENTRY_URL = "https://console.run.claw.cloud/login"
 SIGNIN_URL = f"{LOGIN_ENTRY_URL}/signin"
-DEVICE_VERIFY_WAIT = 30  # Mobile验证 默认等 30 秒
-TWO_FACTOR_WAIT = int(os.environ.get("TWO_FACTOR_WAIT", "120"))  # 2FA验证 默认等 120 秒
+DEVICE_VERIFY_WAIT = get_wait_seconds("DEVICE_VERIFY_WAIT", 120)  # 设备验证 默认等 120 秒
+TWO_FACTOR_WAIT = get_wait_seconds("TWO_FACTOR_WAIT", 120)  # 2FA验证 默认等 120 秒
 
 
 class Telegram:

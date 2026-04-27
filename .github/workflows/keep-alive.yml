@@ -33,6 +33,8 @@ jobs:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
           REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          DEVICE_VERIFY_WAIT: ${{ secrets.DEVICE_VERIFY_WAIT }}
+          TWO_FACTOR_WAIT: ${{ secrets.TWO_FACTOR_WAIT }}
           
         run: python scripts/auto_login.py
         
@@ -42,5 +44,4 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git commit --allow-empty -m "Chore: Keep-alive [skip ci]"
           git push || echo "No changes to push"
-
 
