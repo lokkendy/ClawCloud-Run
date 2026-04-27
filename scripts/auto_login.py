@@ -625,10 +625,41 @@ class AutoLogin:
             self.click(page, ['button[name="authorize"]', 'button:has-text("Authorize")'], "授权")
             time.sleep(3)
             page.wait_for_load_state('networkidle', timeout=30000)
+
+    def continue_github_flow(self, page):
+        """设备验证后，如果 GitHub 停在中间页，尝试继续 OAuth 流程"""
+        if 'github.com' not in page.url:
+            return False
+
+        selectors = [
+            'button[name="authorize"]',
+            'button:has-text("Authorize")',
+            'button:has-text("Continue")',
+            'input[type="submit"]',
+            'a:has-text("Continue")',
+            'a:has-text("Authorize")',
+        ]
+
+        for sel in selectors:
+            try:
+                el = page.locator(sel).first
+                if el.is_visible(timeout=1000):
+                    self.log(f"GitHub 页面仍需继续，尝试点击: {sel}", "WARN")
+                    self.shot(page, "github_等待继续")
+                    el.click()
+                    time.sleep(3)
+                    page.wait_for_load_state('networkidle', timeout=30000)
+                    self.log(f"点击后 URL: {page.url}", "INFO")
+                    return True
+            except:
+                pass
+
+        return False
     
     def wait_redirect(self, page, wait=60):
         """等待重定向并检测区域"""
         self.log("等待重定向...", "STEP")
+        last_url = ""
         for i in range(wait):
             url = page.url
             
@@ -643,12 +674,17 @@ class AutoLogin:
             
             if 'github.com/login/oauth/authorize' in url:
                 self.oauth(page)
+
+            if 'github.com' in url and i % 5 == 0:
+                self.continue_github_flow(page)
             
             time.sleep(1)
-            if i % 10 == 0:
-                self.log(f"  等待... ({i}秒)")
+            if i % 10 == 0 or url != last_url:
+                self.log(f"  等待... ({i}秒) URL: {url}")
+                last_url = url
         
-        self.log("重定向超时", "ERROR")
+        self.log(f"重定向超时，最后 URL: {page.url}", "ERROR")
+        self.shot(page, "重定向超时")
         return False
     
     def keepalive(self, page):
